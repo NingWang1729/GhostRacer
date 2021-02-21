@@ -6,3 +6,6 @@ already installed XQuartz and freeGLUT:
 	make
 3. To run the program, type
 	./GhostRacer
+
+TODO:
+Add all the other classes.
