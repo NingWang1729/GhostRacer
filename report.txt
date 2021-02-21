@@ -23,5 +23,8 @@ About this time, I realized every actor needs to be able to move, so I added a p
 
 Then, I added Human Pedestrians through a class called hooman. These just moved around according to the logic. There was nothing special about it. They differ from actor because they have planned movement, which just changes according to the logic. I also fixed my ghost racer's movement at this point. Thus, I began adding collision checking to Actor class. This would just take a pointer to the other object to collide with to check if they were colliding.
 
-To avoid overcounting for collisions, there will be a hierarchy for collision checking. No NPC type is affected by colliding with its own type, and every other type follows a hierarchy in order of when I implemented them. This avoids a player hitting a zombie and then vice versa, since each collision damages both.
+To avoid overcounting for collisions, there will be a hierarchy for collision checking. No NPC type is affected by colliding with its own type, and every other type follows a hierarchy in order of when they move. This avoids a player hitting a zombie and then vice versa, since each collision damages both, or a goodie bag being picked up twice.
+
+The next part was realizing movement is very similar, and same with bounds checking. I added a virtual move and also a regular out_of_bounds check for Actor, and simplified the code for all movements respectfully.
+
 

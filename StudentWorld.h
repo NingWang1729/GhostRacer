@@ -21,6 +21,7 @@ public:
     void check_for_collisions(Actor*);
     void add_new_objects();
     void add_object(Actor*);
+    ghost_racer* find_MELODY();
 
 private:
     std::vector<Actor*> m_game_objects;

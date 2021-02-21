@@ -3,7 +3,7 @@
 
 #include "GraphObject.h"
 
-enum npc {PLAYER, WHITE_BORDER_LINE, YELLOW_BORDER_LINE, HOLY_WATER_SPRAY, HOOMAN};
+enum npc {PLAYER, WHITE_BORDER_LINE, YELLOW_BORDER_LINE, HOLY_WATER_SPRAY, HOOMAN, ZOMBIE};
 enum color {WHITE, YELLOW};
 
 // Students:  Add code to this file, Actor.cpp, StudentWorld.h, and StudentWorld.cpp
@@ -40,6 +40,12 @@ public:
 
     // This sets y speed
     void set_y_speed(double y_speed);
+
+    // This checks if out of bounds
+    bool out_of_bounds();
+    
+    // Move
+    virtual void move();
 
     // This confirms whethor actor is alive
     bool is_alive();
@@ -185,8 +191,41 @@ public:
     // Change plans
     void set_planned_movement_distance(unsigned long planned_movement_distance);
 
+    // Lose motivation
+    void get_depressed();
+
 private:
     unsigned long m_planned_movement_distance;
+};
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// ZOMBIE CLASS DECLARATIONS
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class zombie : public hooman {
+public:
+    // Constructor
+  zombie(StudentWorld* world, double startX, double startY, unsigned long ticks_until_grunt = 0, unsigned long planned_movement_distance = 0, npc npc_class = ZOMBIE, int imageID = IID_ZOMBIE_PED, int hp = 2, bool alive = true, int strength = 5, unsigned long resistance = 0, bool collision_avoidance_worthy = true, bool hostile = true, int x_speed = 0, int y_speed = -4, int startDirection = 0, double size = 3.0, int depth = 0);
+
+    // Destructor
+    virtual ~zombie();
+
+    // Does whatever a zombie does
+    virtual void doSomething();
+    
+    // Move
+    virtual void move();
+
+    // urrrghhh
+    unsigned long get_ticks_until_grunt();
+
+    // uhgeuhhg
+    void set_ticks_until_grunt(unsigned long ticks_until_grunt);
+    
+    // Grunt
+    void grunt();
+
+private:
+    unsigned long m_ticks_until_grunt;
 };
 
 #endif // ACTOR_H_

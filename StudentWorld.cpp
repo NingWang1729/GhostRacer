@@ -73,7 +73,6 @@ int StudentWorld::move()
     // Is only gam, y u heff to be mad?
     if (!(MELODY->is_alive())) {
         decLives();
-        StudentWorld::playSound(SOUND_PLAYER_DIE);
         return GWSTATUS_PLAYER_DIED;
     }
 
@@ -108,6 +107,11 @@ void StudentWorld::check_for_collisions(Actor* game_object) {
                         game_object->die();
                         return;
                     }
+		case ZOMBIE: {
+		    (*it)->Actor::take_damage(game_object->Actor::get_strength());
+		    game_object->Actor::take_damage((*it)->Actor::get_strength());
+		    break;
+		}
                     default:
                         break;
                 }
@@ -127,6 +131,12 @@ void StudentWorld::check_for_collisions(Actor* game_object) {
                         game_object->die();
                         return;
                     }
+		    case ZOMBIE: {
+		        (*it)->Actor::take_damage(game_object->Actor::get_strength());
+			StudentWorld::playSound(SOUND_PED_HURT);
+			game_object->die();
+		        return;
+		    }
                     default:
                         break;
                 }
@@ -148,7 +158,9 @@ void StudentWorld::add_new_objects() {
             break;
         }
     }
+
     auto new_border_y = VIEW_HEIGHT - SPRITE_HEIGHT;
+
     if (new_border_y - y_pothole >= SPRITE_HEIGHT) {
         m_game_objects.push_back(new road(this, LEFT_EDGE, new_border_y, YELLOW_BORDER_LINE, IID_YELLOW_BORDER_LINE, YELLOW));
         m_game_objects.push_back(new road(this, RIGHT_EDGE, new_border_y, YELLOW_BORDER_LINE, IID_YELLOW_BORDER_LINE, YELLOW));
@@ -159,11 +171,21 @@ void StudentWorld::add_new_objects() {
         m_game_objects.push_back(new road(this, RIGHT_EDGE - ROAD_WIDTH/3, new_border_y));
     }
 
+    // Add hoomans
     if (randInt(0, std::max(200 - GameWorld::getLevel() * 10, 30)) == 0) {
         m_game_objects.push_back(new hooman(this, randInt(0, VIEW_WIDTH), VIEW_HEIGHT));
+    }
+
+    // Add zombies
+    if (randInt(0, std::max(200 - GameWorld::getLevel() * 10, 20)) == 0) {
+        m_game_objects.push_back(new zombie(this, randInt(0, VIEW_WIDTH), VIEW_HEIGHT));
     }
 };
 
 void StudentWorld::add_object(Actor* game_object) {
     m_game_objects.push_back(game_object);
+};
+
+ghost_racer* StudentWorld::find_MELODY() {
+    return MELODY;
 };

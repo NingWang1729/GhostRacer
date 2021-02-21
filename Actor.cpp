@@ -55,6 +55,22 @@ void Actor::set_y_speed(double y_speed) {
     m_y_speed = y_speed;
 }
 
+
+// This checks if out of bounds
+bool Actor::out_of_bounds() {
+    return GraphObject::getX() < 0 || GraphObject::getX() > VIEW_WIDTH ||
+	   GraphObject::getY() < 0 || GraphObject::getY() > VIEW_HEIGHT;
+};
+
+// Move
+void Actor::move() {
+    GraphObject::moveTo(GraphObject::getX() + Actor::get_x_speed(), GraphObject::getY() + Actor::get_y_speed());
+    // Check out of bounds and mileage
+    if (Actor::out_of_bounds()) {
+        Actor::die();
+    }
+}
+
 // This confirms whethor actor is alive
 bool Actor::is_alive() {
     return m_alive;
@@ -73,9 +89,24 @@ void Actor::heal_hp(int heal) {
 // This deals damage to the actor
 void Actor::take_damage(int damage) {
     if (damage - m_resistance> 0) {
-        m_hp -= damage - m_resistance;
+        m_hp -= std::max(std::min((int) (damage - m_resistance), (int) m_hp), 0);
     }
     if (m_hp <= 0) {
+	switch(Actor::get_class()) {
+            case PLAYER: {
+	        Actor::getWorld()->StudentWorld::playSound(SOUND_PLAYER_DIE);
+	        break;
+            }
+            case HOOMAN: {
+            }
+            case ZOMBIE: {
+	        Actor::getWorld()->StudentWorld::playSound(SOUND_PED_DIE);
+	        break;
+            }
+            default: {
+	        break;
+            }
+        }
         Actor::die();
     }
 }
@@ -269,11 +300,12 @@ void road::doSomething() {
 
 // Move
 void road::move() {
-    moveTo(GraphObject::getX() + Actor::get_x_speed(), GraphObject::getY() + Actor::get_y_speed());
-    if (GraphObject::getX() < 0 || GraphObject::getX() > VIEW_WIDTH ||
-        GraphObject::getY() < 0 || GraphObject::getY() > VIEW_HEIGHT) {
-        Actor::die();
-    }
+    Actor::move();
+    // moveTo(GraphObject::getX() + Actor::get_x_speed(), GraphObject::getY() + Actor::get_y_speed());
+    // if (GraphObject::getX() < 0 || GraphObject::getX() > VIEW_WIDTH ||
+    //     GraphObject::getY() < 0 || GraphObject::getY() > VIEW_HEIGHT) {
+    //     Actor::die();
+    // }
 };
 
 // Return road color
@@ -318,9 +350,7 @@ void spray::doSomething() {
 void spray::move() {
     GraphObject::moveForward(SPRITE_HEIGHT);
     // Check out of bounds and mileage
-    if (GraphObject::getX() < 0 || GraphObject::getX() > VIEW_WIDTH ||
-        GraphObject::getY() < 0 || GraphObject::getY() > VIEW_HEIGHT ||
-        spray::distance_traveled() >= 160) {
+    if (Actor::out_of_bounds() || spray::distance_traveled() >= 160) {
         Actor::die();
     }
 };
@@ -331,7 +361,7 @@ unsigned long spray::distance_traveled() {
 };
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// HOOMAN CLASS DECLARATIONS
+// HOOMAN CLASS DEFINITIONS
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Constructor
 hooman::hooman(StudentWorld* world, double startX, double startY, unsigned long planned_movement_distance, npc npc_class, int imageID, int hp, bool alive, int strength, unsigned long resistance, bool collision_avoidance_worthy, bool hostile, int x_speed, int y_speed, int startDirection, double size, int depth)
@@ -365,6 +395,26 @@ void hooman::doSomething() {
     }
     
     // Lose motivation
+    hooman::get_depressed();
+};
+
+//Move
+void hooman::move() {
+    Actor::move();
+};
+
+// Return distance traveled
+unsigned long hooman::get_planned_movement_distance() {
+    return m_planned_movement_distance;
+};
+
+// Change plans
+void hooman::set_planned_movement_distance(unsigned long planned_movement_distance) {
+    m_planned_movement_distance = planned_movement_distance;
+};
+
+// Lose motivation
+void hooman::get_depressed() {
     hooman::set_planned_movement_distance(std::max((int) hooman::get_planned_movement_distance() - 1, 0));
     if (get_planned_movement_distance() <= 0) {
         int x_speed = randInt(1, 3);
@@ -381,24 +431,72 @@ void hooman::doSomething() {
     }
 };
 
-//Move
-void hooman::move() {
-    GraphObject::moveTo(GraphObject::getX() + Actor::get_x_speed(), GraphObject::getY() + Actor::get_y_speed());
-    // Check out of bounds and mileage
-    if (GraphObject::getX() < 0 || GraphObject::getX() > VIEW_WIDTH ||
-        GraphObject::getY() < 0 || GraphObject::getY() > VIEW_HEIGHT) {
-        Actor::die();
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// ZOMBIE CLASS DEFINITIONS
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Constructor
+zombie::zombie(StudentWorld* world, double startX, double startY, unsigned long ticks_until_grunt, unsigned long planned_movement_distance, npc npc_class, int imageID, int hp, bool alive, int strength, unsigned long resistance, bool collision_avoidance_worthy, bool hostile, int x_speed, int y_speed, int startDirection, double size, int depth)
+: hooman(world, startX, startY, planned_movement_distance, npc_class, imageID, hp, alive, strength, resistance, collision_avoidance_worthy, hostile, x_speed, y_speed, startDirection, size, depth) {
+    m_ticks_until_grunt = ticks_until_grunt;
+};
+
+// Destructor
+zombie::~zombie() {};
+
+// Does whatever a zombie does
+void zombie::doSomething() {
+    if (!(Actor::is_alive())) {
+	return;
     }
+    
+    // Check for collisions
+    Actor::getWorld()->StudentWorld::check_for_collisions(this);
+    if (!(Actor::is_alive())) {
+	return;
+    }
+
+    auto MELODY_X = Actor::getWorld()->StudentWorld::find_MELODY()->GraphObject::getX();
+    auto MELODY_Y = Actor::getWorld()->StudentWorld::find_MELODY()->GraphObject::getY();
+    if (abs(MELODY_X - GraphObject::getX()) <= 30 && GraphObject::getY() > MELODY_Y) {
+	GraphObject::setDirection(270);
+	if (MELODY_X > GraphObject::getX()) {
+	    Actor::set_x_speed(1);
+	} else if (MELODY_X < GraphObject::getX()) {
+	    Actor::set_x_speed(-1);
+	} else {
+	    Actor::set_x_speed(0);
+	}
+	zombie::set_ticks_until_grunt(zombie::get_ticks_until_grunt() - 1);
+	if (zombie::get_ticks_until_grunt() <= 0) {
+	    zombie::grunt();
+	}
+    }
+
+    // Move
+    zombie::move();
+
+    // Lose motivation
+    hooman::get_depressed();
 };
 
-// Return distance traveled
-unsigned long hooman::get_planned_movement_distance() {
-    return m_planned_movement_distance;
+// Move
+void zombie::move() {
+    Actor::move();
 };
 
-// Change plans
-void hooman::set_planned_movement_distance(unsigned long planned_movement_distance) {
-    m_planned_movement_distance = planned_movement_distance;
+// urrrghhh
+unsigned long zombie::get_ticks_until_grunt() {
+    return m_ticks_until_grunt;
 };
 
-// Added random comment
+// uhgeuhhg
+void zombie::set_ticks_until_grunt(unsigned long ticks_until_grunt) {
+    m_ticks_until_grunt = ticks_until_grunt;
+};
+
+
+// Grunt
+void zombie::grunt() {
+    Actor::getWorld()->StudentWorld::playSound(SOUND_ZOMBIE_ATTACK);
+    zombie::set_ticks_until_grunt(20);
+};
