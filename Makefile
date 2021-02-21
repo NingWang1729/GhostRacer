@@ -35,4 +35,7 @@ commit:
 	git commit -m "$(m)"
 
 push:
-	git push origin master
+	git push -u origin master
+
+pull:
+	git pull
