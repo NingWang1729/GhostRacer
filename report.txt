@@ -1,0 +1,27 @@
+
+First, I create an abstract Actor class that inherits from GraphObject.
+It takes in "int hp, bool alive, int strength, unsigned long resistance, bool collision_avoidance_worthy, bool hostile, double x_speed, double y_speed, int imageID, double startX, double startY, int startDirection, double size, and int depth." The constructor initializer list would create a GraphObject with the respective parameters. It has "new" private information that are the hp, strength, x_speed, y_speed, alive, collision_avoidance_worthy, and hostile. Most of these are fairly self explanatory. The strength stat will be used for calculating damage dealt, such as for zombies vs zombie cabs when there are collisions with the ghost rider later on.
+
+The Actor class has a doSomething virtual member function, as well as is_alive, heal_hp, take_damage, get_strength, is_collision_avoidance_worthy, and is_hostile mem ber functions. These are self explanatory. take_damage will also change is_alive if too much damage is taken. since roads have 0 hp, they need to still be alive, and they simply won't take damage from anything, so no changes will be made to their alive status. The resistance will be used so roads take no damage.
+
+Next, I began making a road object. I use an enum for color {WHITE, YELLOW}.
+This was pretty much all I needed to do at this point, since I was going to doSomething() later on.
+
+Then, I created a demo of the start under StudentWorld with just a vector of objects. This displayed the initial screen just fine. I would fix the StudentWorld object later on.
+
+The next part was to get the roads and car to show up. I created a vector to store all NPCs and added private vector to Student World as well as pointer to a Ghost Racer. This was named MELODY. Don't judge. Displaying was easy since it automatically displays for some reason. The roads were just fine. Thus, I needed to get them to move, so I wrote the doSomething method for roads (Borders). They just moved down according to the formula. To adjust the actor speeds to the ghost racer, I just moved them all down by MELODY's y speed after they doSomething.
+
+I also added a bit of code to add new roads as the game progressed in move(), which searched for roads in reverse order from the m_game_object vector that stored all actors besides ghost racer. This required adding an enum NPC to the actor class and appropriate access methods. I just had PLAYER (not really an NPC), WHITE_BORDER_LINE, and YELLOW_BORDER_LINE. I put these in the constructors of the Actor class in a way where I would need the fewest number of parameters passed in/with order changed.
+
+Cleaning up the dead object was easy. I just checked during doSomething for Roads if the location was out of bounds. I dealt 999999 damage to them, which killed the roads. This would automatically cause them to die. And, I would search thorugh the vector of game_objects for dead objects and delete them.
+
+Before doSomething for MELODY, I added a pointer to the StudentWorld to the actor class, so they don't accidentally get lost. It happens to the best of us. I implemented all the parts of doSomething for Ghost Racer except for the sound and shooting holy water sprays. Basically, I just added the logic I needed according to the specifications. I used sine and cosine to determine speed increases, using similar triangles to adjust speed for each direction based on direction. I added sound by using getWorld->playSound and also added a destructor to call cleanUp for Student World.
+
+The next step was to finish the GhostRacer class by firing water sprays. To do so, I first created a spray class from Actor. The new features were storing the initial positions of x and y of the spray to calculate distance. I followed the instructions and basically just implemented the logic step by step. I also set up a stub for checking for collisions inside StudentWorld. Thus, the entire Ghostracer class is now finished. What remains now is to do the other classes and checking for collisions.
+
+About this time, I realized every actor needs to be able to move, so I added a pure virtual move method to Actor and changed the movements for each subclass of Actor to call their own move method instead.
+
+Then, I added Human Pedestrians through a class called hooman. These just moved around according to the logic. There was nothing special about it. They differ from actor because they have planned movement, which just changes according to the logic. I also fixed my ghost racer's movement at this point. Thus, I began adding collision checking to Actor class. This would just take a pointer to the other object to collide with to check if they were colliding.
+
+To avoid overcounting for collisions, there will be a hierarchy for collision checking. No NPC type is affected by colliding with its own type, and every other type follows a hierarchy in order of when I implemented them. This avoids a player hitting a zombie and then vice versa, since each collision damages both.
+
