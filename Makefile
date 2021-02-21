@@ -34,7 +34,7 @@ run:
 
 git: add commit push
 
-add:
+add: clean
 	git add -A
 
 commit:
