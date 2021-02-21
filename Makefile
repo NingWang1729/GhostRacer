@@ -11,6 +11,9 @@ HEADERS = $(wildcard *.h)
 
 PRODUCT = GhostRacer
 
+
+# Compilation commands
+
 all: $(PRODUCT)
 	./GhostRacer
 
@@ -25,6 +28,9 @@ clean:
 
 run:
 	./GhostRacer
+
+
+# Git commands via Makefile
 
 git: add commit push
 
