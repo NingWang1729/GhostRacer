@@ -26,5 +26,8 @@ clean:
 run:
 	./GhostRacer
 
+add:
+	echo -e "a\n*\nq\n"|git add -i
+
 push:
 	git push origin master
