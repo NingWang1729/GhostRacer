@@ -26,8 +26,13 @@ clean:
 run:
 	./GhostRacer
 
+git: add commit push
+
 add:
-	echo -e "a\n*\nq\n"|git add -i
+	git add -A
+
+commit:
+	git commit -m "$(m)"
 
 push:
 	git push origin master
