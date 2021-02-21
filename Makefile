@@ -21,7 +21,10 @@ $(PRODUCT): $(OBJECTS)
 	$(CC) $(OBJECTS) $(LIBS) -o $@
 
 clean:
-	rm -f *.o *~ $(PRODUCT)
+	rm -f *.o *~ *# $(PRODUCT)
 
 run:
 	./GhostRacer
+
+push:
+	git push origin master
