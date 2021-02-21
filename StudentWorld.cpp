@@ -104,7 +104,7 @@ void StudentWorld::check_for_collisions(Actor* game_object) {
                     case HOOMAN: {
                         (*it)->die();
                         StudentWorld::playSound(SOUND_PED_HURT);
-                        game_object->die();
+                        game_object->Actor::take_damage((*it)->Actor::get_strength());
                         return;
                     }
 		case ZOMBIE: {
