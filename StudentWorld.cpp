@@ -307,12 +307,14 @@ void StudentWorld::add_new_objects() {
 	    }
         }
 	// Got the random lane order.
+	bool open_lane = false;
 	for (int i = 0; i < 3; i++) {
 	    if (bottom[i] == nullptr || bottom[i]->GraphObject::getY() > (VIEW_HEIGHT / 3)) {
 		// This is the lane
 		y = SPRITE_HEIGHT / 2;
 		y_speed = StudentWorld::find_MELODY()->Actor::get_y_speed() + randInt(2, 4);
 		x = lane[i];
+		open_lane = true;
 		break;
 	    }
 	    if (top[i] == nullptr || top[i]->GraphObject::getY() < (VIEW_HEIGHT * 2 / 3)) {
@@ -320,10 +322,13 @@ void StudentWorld::add_new_objects() {
 		y = VIEW_HEIGHT - SPRITE_HEIGHT / 2;
 		y_speed = StudentWorld::find_MELODY()->Actor::get_y_speed() - randInt(2, 4);
 		x = lane[i];
+		open_lane = true;
 		break;
 	    }
 	}
-        m_game_objects.push_back(new zombie_cab(this, x, y, x_speed, y_speed));
+	if (open_lane) {
+	    m_game_objects.push_back(new zombie_cab(this, x, y, x_speed, y_speed));
+	}
     }
 };
 
