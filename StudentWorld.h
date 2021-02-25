@@ -22,6 +22,7 @@ public:
     void add_new_objects();
     void add_object(Actor*);
     ghost_racer* find_MELODY();
+    void find_collidable_objects(Actor* &top_left, Actor* &top_center, Actor* &top_right, Actor* &bottom_left, Actor* &bottom_center, Actor* &bottom_right);
 
 private:
     std::vector<Actor*> m_game_objects;

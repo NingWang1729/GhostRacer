@@ -25,6 +25,4 @@ Then, I added Human Pedestrians through a class called hooman. These just moved 
 
 To avoid overcounting for collisions, there will be a hierarchy for collision checking. No NPC type is affected by colliding with its own type, and every other type follows a hierarchy in order of when they move. This avoids a player hitting a zombie and then vice versa, since each collision damages both, or a goodie bag being picked up twice.
 
-The next part was realizing movement is very similar, and same with bounds checking. I added a virtual move and also a regular out_of_bounds check for Actor, and simplified the code for all movements respectfully.
-
-
+The next part was realizing movement is very similar, and same with bounds checking. I added a virtual move and also a regular out_of_bounds check for Actor, and simplified the code for all movements respectfully. I then changed the death sounds to trigger when hp reduces to 0 or less through taking damage, since dying might not make any sound if they run out of bounds. Then, I added dealing damage between ghostrider and zombies through collisions.

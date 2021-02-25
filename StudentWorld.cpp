@@ -107,11 +107,27 @@ void StudentWorld::check_for_collisions(Actor* game_object) {
                         game_object->Actor::take_damage((*it)->Actor::get_strength());
                         return;
                     }
-		case ZOMBIE: {
-		    (*it)->Actor::take_damage(game_object->Actor::get_strength());
-		    game_object->Actor::take_damage((*it)->Actor::get_strength());
-		    break;
-		}
+		    case ZOMBIE: {
+		        (*it)->Actor::take_damage(game_object->Actor::get_strength());
+        	        game_object->Actor::take_damage((*it)->Actor::get_strength());
+		        break;
+		    }
+		    case ZOMBIE_CAB: {
+			if (!((*it)->zombie_cab::is_hostile())) {
+			    break;
+			}
+			StudentWorld::playSound(SOUND_VEHICLE_CRASH);
+			(*it)->Actor::make_peace();
+		        if ((*it)->GraphObject::getX() > game_object->GraphObject::getX()) {
+			    (*it)->Actor::set_x_speed(5);
+			    (*it)->GraphObject::setDirection(60 - randInt(0,19));
+			} else {
+			    (*it)->Actor::set_x_speed(-5);
+			    (*it)->GraphObject::setDirection(120 + randInt(0,19));
+			}
+			game_object->Actor::take_damage((*it)->Actor::get_strength());
+	                break;
+	            }
                     default:
                         break;
                 }
@@ -133,7 +149,17 @@ void StudentWorld::check_for_collisions(Actor* game_object) {
                     }
 		    case ZOMBIE: {
 		        (*it)->Actor::take_damage(game_object->Actor::get_strength());
-			StudentWorld::playSound(SOUND_PED_HURT);
+			if ((*it)->Actor::is_alive()) {
+                            StudentWorld::playSound(SOUND_PED_HURT);
+			}
+			game_object->die();
+		        return;
+		    }
+		    case ZOMBIE_CAB: {
+		        (*it)->Actor::take_damage(game_object->Actor::get_strength());
+			if ((*it)->Actor::is_alive()) {
+                            StudentWorld::playSound(SOUND_VEHICLE_HURT);
+			}
 			game_object->die();
 		        return;
 		    }
@@ -172,13 +198,132 @@ void StudentWorld::add_new_objects() {
     }
 
     // Add hoomans
-    if (randInt(0, std::max(200 - GameWorld::getLevel() * 10, 30)) == 0) {
+    if (randInt(0, std::max(200 - GameWorld::getLevel() * 10, 30) - 1) == 0) {
         m_game_objects.push_back(new hooman(this, randInt(0, VIEW_WIDTH), VIEW_HEIGHT));
     }
 
+
     // Add zombies
-    if (randInt(0, std::max(200 - GameWorld::getLevel() * 10, 20)) == 0) {
+    if (randInt(0, std::max(200 - GameWorld::getLevel() * 10, 20) - 1) == 0) {
         m_game_objects.push_back(new zombie(this, randInt(0, VIEW_WIDTH), VIEW_HEIGHT));
+    }
+
+    // Add zombie cabs
+    if (randInt(0, std::max(200 - GameWorld::getLevel() * 10, 20) - 1) == 0) {
+        // Try to add a cab
+        Actor* tl = nullptr;
+	Actor* tc = nullptr;
+	Actor* tr = nullptr;
+	Actor* bl = nullptr;
+	Actor* bc = nullptr;
+	Actor* br = nullptr;
+	StudentWorld::find_collidable_objects(tl, tc, tr, bl, bc, br);
+
+        int y = 0;
+	int y_speed = 0;
+	int x = 0;
+	int x_speed = 0;
+	
+	std::vector<Actor*> top;
+	std::vector<Actor*> bottom;
+	std::vector<int> lane;
+
+	int center_lane = ROAD_CENTER;
+	int left_lane = ROAD_CENTER - ROAD_WIDTH/3;
+	int right_lane = ROAD_CENTER + ROAD_WIDTH/3;
+	
+	switch(randInt(0, 5)) {
+	    case 1: {
+		top.push_back(tl);
+		top.push_back(tc);
+		top.push_back(tr);
+		bottom.push_back(bl);
+		bottom.push_back(bc);
+		bottom.push_back(br);
+		lane.push_back(left_lane);
+		lane.push_back(center_lane);
+		lane.push_back(right_lane);
+	        break;
+	    }
+	    case 2: {
+		top.push_back(tl);
+		top.push_back(tr);
+		top.push_back(tc);
+		bottom.push_back(tl);
+		bottom.push_back(tr);
+		bottom.push_back(tc);
+		lane.push_back(left_lane);
+		lane.push_back(right_lane);
+		lane.push_back(center_lane);
+	        break;
+	    }
+	    case 3: {
+		top.push_back(tc);
+		top.push_back(tl);
+		top.push_back(tr);
+		bottom.push_back(bc);
+		bottom.push_back(bl);
+		bottom.push_back(br);
+		lane.push_back(center_lane);
+		lane.push_back(left_lane);
+		lane.push_back(right_lane);
+	        break;
+	    }
+	    case 4: {
+		top.push_back(tc);
+		top.push_back(tr);
+		top.push_back(tl);
+		bottom.push_back(bc);
+		bottom.push_back(br);
+		bottom.push_back(bl);
+		lane.push_back(center_lane);
+		lane.push_back(right_lane);
+		lane.push_back(left_lane);
+	        break;
+	    }
+	    case 5: {
+		top.push_back(tr);
+		top.push_back(tc);
+		top.push_back(tl);
+		bottom.push_back(br);
+		bottom.push_back(bc);
+		bottom.push_back(bl);
+		lane.push_back(right_lane);
+		lane.push_back(center_lane);
+		lane.push_back(left_lane);
+	        break;
+	    }
+	    default: {
+		top.push_back(tr);
+		top.push_back(tl);
+		top.push_back(tc);
+		bottom.push_back(br);
+		bottom.push_back(bl);
+		bottom.push_back(bc);
+		lane.push_back(right_lane);
+		lane.push_back(left_lane);
+		lane.push_back(center_lane);
+		break;
+	    }
+        }
+	// Got the random lane order.
+	for (int i = 0; i < 3; i++) {
+	    if (bottom[i] == nullptr || bottom[i]->GraphObject::getY() > (VIEW_HEIGHT / 3)) {
+		// This is the lane
+		y = SPRITE_HEIGHT / 2;
+		y_speed = StudentWorld::find_MELODY()->Actor::get_y_speed() + randInt(2, 4);
+		x = lane[i];
+		break;
+	    }
+	    if (top[i] == nullptr || top[i]->GraphObject::getY() < (VIEW_HEIGHT * 2 / 3)) {
+		// This is the lane
+		y = VIEW_HEIGHT - SPRITE_HEIGHT / 2;
+		y_speed = StudentWorld::find_MELODY()->Actor::get_y_speed() - randInt(2, 4);
+		x = lane[i];
+		break;
+	    }
+	}
+        m_game_objects.push_back(new zombie_cab(this, x, y, x_speed, y_speed));
     }
 };
 
@@ -189,3 +334,77 @@ void StudentWorld::add_object(Actor* game_object) {
 ghost_racer* StudentWorld::find_MELODY() {
     return MELODY;
 };
+
+// Find top objects for each lane
+void StudentWorld::find_collidable_objects(Actor* &top_left, Actor* &top_center, Actor* &top_right, Actor* &bottom_left, Actor* &bottom_center, Actor* &bottom_right) {
+    Actor* tl = nullptr;
+    Actor* tc = nullptr;
+    Actor* tr = nullptr;
+    Actor* bl = nullptr;
+    Actor* bc = nullptr;
+    Actor* br = nullptr;
+    int max_left = 0;
+    int max_center = 0;
+    int max_right = 0;
+    int min_left = 255;
+    int min_center = 255;
+    int min_right = 255;
+
+    std::vector<Actor*> all_game_objects = m_game_objects;
+    all_game_objects.push_back(StudentWorld::find_MELODY());
+    
+    for (std::vector<Actor*>::iterator it = all_game_objects.begin(); it!= all_game_objects.end(); it++) {
+	if (!((*it)->Actor::is_collision_avoidance_worthy())) {
+	    // Not a collision avoidance worthy actor
+	    continue;
+	}
+	if ((*it)->GraphObject::getX() < LEFT_EDGE) {
+	    // Not on the road
+	    continue;
+	}
+	if ((*it)->GraphObject::getX() < LEFT_EDGE + ROAD_WIDTH/3) {
+	    // On left lane
+	    if ((*it)->GraphObject::getY() > max_left) {
+		max_left = (*it)->GraphObject::getY();
+		tl = *it;
+	    }
+	    if ((*it)->GraphObject::getY() < min_left) {
+		min_left = (*it)->GraphObject::getY();
+		bl = *it;
+	    }
+	    continue;
+	}
+	if ((*it)->GraphObject::getX() < RIGHT_EDGE - ROAD_WIDTH/3) {
+	    // On center lane
+	    if ((*it)->GraphObject::getY() > max_center) {
+		max_center = (*it)->GraphObject::getY();
+		tc = *it;
+	    }
+	    if ((*it)->GraphObject::getY() < min_center) {
+		min_center = (*it)->GraphObject::getY();
+		bc = *it;
+	    }
+	    continue;
+	}
+	if ((*it)->GraphObject::getX() < RIGHT_EDGE) {
+	    // On Right lane
+	    if ((*it)->GraphObject::getY() > max_right) {
+		max_right = (*it)->GraphObject::getY();
+		tr = *it;
+	    }
+	    if ((*it)->GraphObject::getY() < min_right) {
+		min_right = (*it)->GraphObject::getY();
+		br = *it;
+	    }
+	    continue;
+	}
+	// Not on the road
+    }
+
+    top_left = tl;
+    top_center = tc;
+    top_right = tr;
+    bottom_left = bl;
+    bottom_center = bc;
+    bottom_right = br;
+}

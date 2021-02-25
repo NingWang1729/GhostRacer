@@ -103,6 +103,10 @@ void Actor::take_damage(int damage) {
 	        Actor::getWorld()->StudentWorld::playSound(SOUND_PED_DIE);
 	        break;
             }
+            case ZOMBIE_CAB: {
+	        Actor::getWorld()->StudentWorld::playSound(SOUND_VEHICLE_DIE);
+	        break;
+            }		
             default: {
 	        break;
             }
@@ -129,6 +133,11 @@ bool Actor::is_collision_avoidance_worthy() {
 // An actor is hostile iff your holy water bullets do damage to it.
 bool Actor::is_hostile() {
     return m_hostile;
+}
+
+// Males hostile actor no longer hostile
+void Actor::make_peace() {
+    m_hostile = false;
 }
 
 // Checks for collision
@@ -499,4 +508,61 @@ void zombie::set_ticks_until_grunt(unsigned long ticks_until_grunt) {
 void zombie::grunt() {
     Actor::getWorld()->StudentWorld::playSound(SOUND_ZOMBIE_ATTACK);
     zombie::set_ticks_until_grunt(20);
+};
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// ZOMBIE CAB CLASS DEFINITIONS
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Constructor
+zombie_cab::zombie_cab(StudentWorld* world, double startX, double startY, int x_speed, int y_speed, unsigned long planned_movement_distance, npc npc_class, int imageID, int hp, bool alive, int strength, unsigned long resistance, bool collision_avoidance_worthy, bool hostile, int startDirection, double size, int depth)
+: hooman(world, startX, startY, planned_movement_distance, npc_class, imageID, hp, alive, strength, resistance, collision_avoidance_worthy, hostile, x_speed, y_speed, startDirection, size, depth) {
+    std::cout << "x_speed: " << x_speed << "\ny_speed: " << y_speed << "\n direction: " << startDirection << "\n";
+};
+
+// Destructor
+zombie_cab::~zombie_cab() {};
+
+// Does whatever a ghost racer
+void zombie_cab::doSomething() {
+    if (!(Actor::is_alive())) {
+        return;
+    }
+    
+    // Check for collisions
+    Actor::getWorld()->check_for_collisions(this);
+    
+    // Kerplat!
+    if (!(Actor::is_alive())) {
+        return;
+    }
+    
+    // Jaywalk
+    zombie_cab::move();
+    
+    // Fall off bridge
+    if (!(Actor::is_alive())) {
+        return;
+    }
+    
+    // Lose motivation
+    zombie_cab::get_depressed();
+};
+
+// Vroom vroom
+void zombie_cab::move() {
+    Actor::move();
+};
+
+// Lose motivation
+void zombie_cab::get_depressed() {
+    hooman::set_planned_movement_distance(std::max((int) hooman::get_planned_movement_distance() - 1, 0));
+    if (get_planned_movement_distance() <= 0) {
+        int x_speed = randInt(1, 3);
+        if (randInt(0, 1)) {
+            x_speed *= -1;
+        }
+        Actor::set_x_speed(x_speed);
+        hooman::set_planned_movement_distance(randInt(4, 32));
+    }
 };

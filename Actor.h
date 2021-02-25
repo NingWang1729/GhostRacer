@@ -3,7 +3,7 @@
 
 #include "GraphObject.h"
 
-enum npc {PLAYER, WHITE_BORDER_LINE, YELLOW_BORDER_LINE, HOLY_WATER_SPRAY, HOOMAN, ZOMBIE};
+enum npc {PLAYER, WHITE_BORDER_LINE, YELLOW_BORDER_LINE, HOLY_WATER_SPRAY, HOOMAN, ZOMBIE, ZOMBIE_CAB};
 enum color {WHITE, YELLOW};
 
 // Students:  Add code to this file, Actor.cpp, StudentWorld.h, and StudentWorld.cpp
@@ -67,6 +67,9 @@ public:
 
     // An actor is hostile iff your holy water bullets do damage to it.
     bool is_hostile();
+
+    // Makes hostile actor no longer hostile
+    void make_peace();
     
     // Checks for collision
     bool collided_with(Actor* other);
@@ -192,7 +195,7 @@ public:
     void set_planned_movement_distance(unsigned long planned_movement_distance);
 
     // Lose motivation
-    void get_depressed();
+    virtual void get_depressed();
 
 private:
     unsigned long m_planned_movement_distance;
@@ -226,6 +229,28 @@ public:
 
 private:
     unsigned long m_ticks_until_grunt;
+};
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// ZOMBIE CAB CLASS DECLARATIONS
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class zombie_cab : public hooman {
+public:
+    // Constructor
+  zombie_cab(StudentWorld* world, double startX, double startY,  int x_speed = 0, int y_speed = 0, unsigned long planned_movement_distance = 0, npc npc_class = ZOMBIE_CAB, int imageID = IID_ZOMBIE_CAB, int hp = 3, bool alive = true, int strength = 15, unsigned long resistance = 0, bool collision_avoidance_worthy = true, bool hostile = true, int startDirection = 90, double size = 4.0, int depth = 0);
+
+    // Destructor
+    virtual ~zombie_cab();
+
+    // Does whatever a zombie does
+    virtual void doSomething();
+    
+    // Move
+    virtual void move();
+
+    // Get Depressed
+    virtual void get_depressed();
+private:
 };
 
 #endif // ACTOR_H_
