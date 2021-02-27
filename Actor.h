@@ -3,7 +3,7 @@
 
 #include "GraphObject.h"
 
-enum npc {PLAYER, WHITE_BORDER_LINE, YELLOW_BORDER_LINE, HOLY_WATER_SPRAY, HOOMAN, ZOMBIE, ZOMBIE_CAB, OIL_SLICK};
+enum npc {PLAYER, WHITE_BORDER_LINE, YELLOW_BORDER_LINE, HOLY_WATER_SPRAY, HOOMAN, ZOMBIE, ZOMBIE_CAB, OIL_SLICK, HEAL, AMMO, SOUL};
 enum color {WHITE, YELLOW};
 
 // Students:  Add code to this file, Actor.cpp, StudentWorld.h, and StudentWorld.cpp
@@ -18,10 +18,10 @@ public:
     Actor (StudentWorld* world, npc npc_class, int hp, bool alive, int strength, unsigned long resistance, bool collision_avoidance_worthy, bool hostile, double x_speed, double y_speed, int imageID, double startX, double startY, int startDirection = 0, double size = 1.0, int depth = 0);
 
     // Destructor
-    virtual ~Actor() {};
+    virtual ~Actor();
 
     // This does something depending on the child class
-    virtual void doSomething() = 0;
+    virtual void doSomething();
     
     // This returns the world
     StudentWorld* getWorld();
@@ -247,17 +247,55 @@ public:
 private:
 };
 
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // OIL_SLICK CLASS DECLARATIONS
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class oil_slick : public Actor {
 public:
     // Constructor
-    oil_slick(StudentWorld* world, double startX, double startY, double size, npc npc_class = OIL_SLICK, int imageID =  IID_OIL_SLICK, int hp = 0, bool alive = true, int strength = 0, unsigned long resistance = 1000, bool collision_avoidance_worthy = false, bool hostile = false, int x_speed = 0, int y_speed = -4, int startDirection = 0, int depth = 2);
+    oil_slick(StudentWorld* world, double startX, double startY, double size, npc npc_class = OIL_SLICK, int imageID = IID_OIL_SLICK, int hp = 0, bool alive = true, int strength = 0, unsigned long resistance = 1000, bool collision_avoidance_worthy = false, bool hostile = false, int x_speed = 0, int y_speed = -4, int startDirection = 0, int depth = 2);
 
     // Destructor
     virtual ~oil_slick();
+
+    // Does whatever a spray does
+    virtual void doSomething();
+};
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//  HEAL CLASS DECLARATIONS
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class heal : public Actor {
+public:
+    // Constructor
+    heal(StudentWorld* world, double startX, double startY, npc npc_class = HEAL, int imageID =  IID_HEAL_GOODIE, int hp = 1, bool alive = true, int strength = 10, unsigned long resistance = 0, bool collision_avoidance_worthy = false, bool hostile = false, int x_speed = 0, int y_speed = -4, int startDirection = 0, double size = 1, int depth = 2);
+
+    // Destructor
+    virtual ~heal();
+};
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//  AMMO CLASS DECLARATIONS
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class ammo : public Actor {
+public:
+    // Constructor
+    ammo(StudentWorld* world, double startX, double startY, npc npc_class = AMMO, int imageID = IID_HOLY_WATER_GOODIE, int hp = 1, bool alive = true, int strength = 10, unsigned long resistance = 0, bool collision_avoidance_worthy = false, bool hostile = false, int x_speed = 0, int y_speed = -4, int startDirection = 90, double size = 2, int depth = 2);
+
+    // Destructor
+    virtual ~ammo();
+};
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//  CLASS DECLARATIONS
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class soul : public Actor {
+public:
+    // Constructor
+    soul(StudentWorld* world, double startX, double startY, npc npc_class = SOUL, int imageID = IID_SOUL_GOODIE, int hp = 0, bool alive = true, int strength = 0, unsigned long resistance = 1000, bool collision_avoidance_worthy = false, bool hostile = false, int x_speed = 0, int y_speed = -4, int startDirection = 0, double size = 4, int depth = 2);
+
+    // Destructor
+    virtual ~soul();
 
     // Does whatever a spray does
     virtual void doSomething();

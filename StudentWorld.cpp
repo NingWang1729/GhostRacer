@@ -152,6 +152,27 @@ void StudentWorld::check_for_collisions(Actor* game_object) {
         	        StudentWorld::find_MELODY()->ghost_racer::hydroplane();
 		        break;
 		    }
+		    case HEAL: {
+			StudentWorld::find_MELODY()->ghost_racer::heal_hp((*it)->Actor::get_strength());
+			StudentWorld::playSound(SOUND_GOT_GOODIE);
+			GameWorld::increaseScore(250);
+        	        (*it)->Actor::take_damage(game_object->Actor::get_strength());
+		        break;
+		    }
+		    case AMMO: {
+			StudentWorld::find_MELODY()->ghost_racer::reload((*it)->Actor::get_strength());
+			StudentWorld::playSound(SOUND_GOT_GOODIE);
+			GameWorld::increaseScore(50);
+        	        (*it)->Actor::take_damage(game_object->Actor::get_strength());
+		        break;
+		    }
+		    case SOUL: {
+			StudentWorld::save_soul();
+			StudentWorld::playSound(SOUND_GOT_SOUL);
+			GameWorld::increaseScore(100);
+        	        (*it)->Actor::die();
+		        break;
+		    }
                     default:
                         break;
                 }
@@ -176,6 +197,9 @@ void StudentWorld::check_for_collisions(Actor* game_object) {
 			if ((*it)->Actor::is_alive()) {
                             StudentWorld::playSound(SOUND_PED_HURT);
 			} else {
+			    if (randInt(0, 4) == 0) {
+				m_game_objects.push_back(new heal(this, (*it)->GraphObject::getX(), (*it)->GraphObject::getY()));
+			    }
 			    GameWorld::increaseScore(150);
 			}
 			game_object->die();
@@ -193,6 +217,16 @@ void StudentWorld::check_for_collisions(Actor* game_object) {
 			}
 			game_object->die();
 		        return;
+		    }
+		    case HEAL: {
+			(*it)->Actor::take_damage(game_object->Actor::get_strength());
+        	        game_object->die();
+		        break;
+		    }
+		    case AMMO: {
+			(*it)->Actor::take_damage(game_object->Actor::get_strength());
+        	        game_object->die();
+		        break;
 		    }
                     default:
                         break;
@@ -364,6 +398,12 @@ void StudentWorld::add_new_objects() {
     if (randInt(0, std::max(150 - GameWorld::getLevel() * 10, 40) - 1) == 0) {
 	m_game_objects.push_back(new oil_slick(this, randInt(LEFT_EDGE, RIGHT_EDGE), VIEW_HEIGHT, randInt(2, 5)));
     }
+    if (randInt(0, 100 + GameWorld::getLevel() * 10 - 1) == 0) {
+	m_game_objects.push_back(new ammo(this, randInt(LEFT_EDGE, RIGHT_EDGE), VIEW_HEIGHT));
+    }
+    if (randInt(0, 100 - 1) == 0) {
+	m_game_objects.push_back(new soul(this, randInt(LEFT_EDGE, RIGHT_EDGE), VIEW_HEIGHT));
+    }
 };
 
 void StudentWorld::add_object(Actor* game_object) {
@@ -470,3 +510,4 @@ void StudentWorld::find_collidable_objects(Actor* &top_left, Actor* &top_center,
 void StudentWorld::save_soul() {
     m_souls_to_save = m_souls_to_save > 0 ? m_souls_to_save - 1 : 0;
 }
+

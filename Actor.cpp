@@ -25,6 +25,28 @@ Actor::Actor (StudentWorld* world, npc npc_class, int hp, bool alive, int streng
     m_hostile = hostile;
 };
 
+// Destructor
+Actor::~Actor() {};
+
+
+// Does whatever an actor does
+void Actor::doSomething() {
+    if (!(Actor::is_alive())) {
+        return;
+    }
+    
+    Actor::move();
+
+    // Died after moving?
+    if (!(Actor::is_alive())) {
+        return;
+    }
+
+    // Check for collisions
+    Actor::getWorld()->StudentWorld::check_for_collisions(this);
+};
+
+
 // This returns the world
 StudentWorld* Actor::getWorld() {
     return m_world;
@@ -185,7 +207,6 @@ void ghost_racer::doSomething() {
     } else {
         int ch;
         if (getWorld()->getKey(ch)) {
-	    std::cout << ch << std::endl;
             switch (ch) {
                 case KEY_PRESS_SPACE: {
                     ghost_racer::fire();
@@ -227,16 +248,20 @@ void ghost_racer::doSomething() {
                     }
                     break;
                 }
-                case 111:{ // O key to test oil slick
-                    ghost_racer::hydroplane();
-                    break;
-                }
-	        case 104: { // H key to fill with holy water
+	        case 121: { // Y key to fill with holy water
                     ghost_racer::reload(999);
                     break;
                 }
-		case 108: { // H key to fill with holy water
+		case 111:{ // O key to test oil slick
+                    ghost_racer::hydroplane();
+                    break;
+                }
+		case 108: { // L key to make level progress
 		    Actor::getWorld()->StudentWorld::save_soul();
+                    break;
+                }
+		case 104: { // H key to heal
+                    Actor::heal_hp(10);
                     break;
                 }
                 case KEY_PRESS_TAB:{
@@ -618,3 +643,38 @@ void oil_slick::doSomething() {
     Actor::getWorld()->StudentWorld::check_for_collisions(this);
 };
 
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// HEAL CLASS DEFINITIONS
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+heal::heal(StudentWorld* world, double startX, double startY, npc npc_class, int imageID, int hp, bool alive, int strength, unsigned long resistance, bool collision_avoidance_worthy, bool hostile, int x_speed, int y_speed, int startDirection, double size, int depth)
+: Actor(world, npc_class, hp, alive, strength, resistance, collision_avoidance_worthy, hostile, x_speed, y_speed, imageID, startX, startY, startDirection, size, depth) {};
+
+// Destructor
+heal::~heal() {};
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// AMMO CLASS DEFINITIONS
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ammo::ammo(StudentWorld* world, double startX, double startY, npc npc_class, int imageID, int hp, bool alive, int strength, unsigned long resistance, bool collision_avoidance_worthy, bool hostile, int x_speed, int y_speed, int startDirection, double size, int depth)
+: Actor(world, npc_class, hp, alive, strength, resistance, collision_avoidance_worthy, hostile, x_speed, y_speed, imageID, startX, startY, startDirection, size, depth) {};
+
+// Destructor
+ammo::~ammo() {};
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// SOUL CLASS DEFINITIONS
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+soul::soul(StudentWorld* world, double startX, double startY, npc npc_class, int imageID, int hp, bool alive, int strength, unsigned long resistance, bool collision_avoidance_worthy, bool hostile, int x_speed, int y_speed, int startDirection, double size, int depth)
+: Actor(world, npc_class, hp, alive, strength, resistance, collision_avoidance_worthy, hostile, x_speed, y_speed, imageID, startX, startY, startDirection, size, depth) {};
+
+// Destructor
+soul::~soul() {};
+
+// Does whatever an oil slick does
+void soul::doSomething() {
+    Actor::doSomething();
+    GraphObject::setDirection((GraphObject::getDirection() + 350) % 360);
+};

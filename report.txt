@@ -1,11 +1,11 @@
+Note: I wrote this report as I made the project with each paragraph roughly corresponding to the git commits I made at each stage. As such, each paragraph is roughly a child commit to the previous paragraph, with some backtracking. This should also make it more understandable than arbitrarily jumping betweeen classes.
 
-First, I create an abstract Actor class that inherits from GraphObject.
-It takes in "int hp, bool alive, int strength, unsigned long resistance, bool collision_avoidance_worthy, bool hostile, double x_speed, double y_speed, int imageID, double startX, double startY, int startDirection, double size, and int depth." The constructor initializer list would create a GraphObject with the respective parameters. It has "new" private information that are the hp, strength, x_speed, y_speed, alive, collision_avoidance_worthy, and hostile. Most of these are fairly self explanatory. The strength stat will be used for calculating damage dealt, such as for zombies vs zombie cabs when there are collisions with the ghost rider later on.
+First, I create an Actor class that inherits from GraphObject. It takes in "int hp, bool alive, int strength, unsigned long resistance, bool collision_avoidance_worthy, bool hostile, double x_speed, double y_speed, int imageID, double startX, double startY, int startDirection, double size, and int depth." The constructor initializer list would create a GraphObject with the respective parameters. It has "new" private information that are the hp, strength, x_speed, y_speed, alive, collision_avoidance_worthy, and hostile. Most of these are fairly self explanatory, with their respective getters and setters. The strength stat will be used for calculating damage dealt, such as for zombies vs zombie cabs when there are collisions with the ghost rider later on. Actors can also be told to die() without taking any damage, such as going out of bounds. They can also be made non-hostile, such as with zombie cabs by make_peace();
 
-The Actor class has a doSomething virtual member function, as well as is_alive, heal_hp, take_damage, get_strength, is_collision_avoidance_worthy, and is_hostile mem ber functions. These are self explanatory. take_damage will also change is_alive if too much damage is taken. since roads have 0 hp, they need to still be alive, and they simply won't take damage from anything, so no changes will be made to their alive status. The resistance will be used so roads take no damage.
+The Actor class has a doSomething virtual member function, as well as is_alive, heal_hp, take_damage, get_strength, is_collision_avoidance_worthy, and is_hostile mem ber functions. These are self explanatory. take_damage will also change is_alive if too much damage is taken. since roads have 0 hp, they need to still be alive, and they simply won't take damage from anything, so no changes will be made to their alive status. The resistance will or may be used so roads take no damage. doSomething in Actor just moves and checks for collisions. This is good enough for some goodies, like heal and ammo.
 
 Next, I began making a road object. I use an enum for color {WHITE, YELLOW}.
-This was pretty much all I needed to do at this point, since I was going to doSomething() later on.
+This was pretty much all I needed to do at this point, since I was going to doSomething() later on. Roads were Actors because they did something.
 
 Then, I created a demo of the start under StudentWorld with just a vector of objects. This displayed the initial screen just fine. I would fix the StudentWorld object later on.
 
@@ -19,19 +19,74 @@ Before doSomething for MELODY, I added a pointer to the StudentWorld to the acto
 
 The next step was to finish the GhostRacer class by firing water sprays. To do so, I first created a spray class from Actor. The new features were storing the initial positions of x and y of the spray to calculate distance. I followed the instructions and basically just implemented the logic step by step. I also set up a stub for checking for collisions inside StudentWorld. Thus, the entire Ghostracer class is now finished. What remains now is to do the other classes and checking for collisions.
 
-About this time, I realized every actor needs to be able to move, so I added a pure virtual move method to Actor and changed the movements for each subclass of Actor to call their own move method instead.
+About this time, I realized every actor needs to be able to move, so I added a pure virtual move method to Actor and changed the movements for each subclass of Actor to call their own move method instead. Most of these simply moved to their x and y coordinates, using the same logic as Actor::move(), not to be confused with StudentWorld::move(). Only GR and the sprays differed because they use their direction to help decide their movement, so these were the ones who needed their own move(), which was made easy since move is virtual for Actor.
 
-Then, I added Human Pedestrians through a class called hooman. These just moved around according to the logic. There was nothing special about it. They differ from actor because they have planned movement, which just changes according to the logic. I also fixed my ghost racer's movement at this point. Thus, I began adding collision checking to Actor class. This would just take a pointer to the other object to collide with to check if they were colliding.
+Then, I added Human Pedestrians through a class called hooman. These just moved around according to the logic. There was nothing special about it. They differ from actor because they have planned movement, which just changes according to the logic. I also fixed my ghost racer's movement at this point. Thus, I began adding collision checking to Actor class. This would just take a pointer to the other object to collide with to check if they were colliding. A note is that hoomans would call getDepressed() to reduce their movement plan. This was to mimic realism and would reduce their movement plan. When their plan hits 0, then they would come up with a new movement plan. This hooman method was virtual since zombie cabs would later on use similar logic to reduce movement, but this time it is vertical movement rather than horizontal.
 
 Zombies were the same as hoomans except they would grunt and not instantly kill the Ghost Racer. Thus, Zombies were a type of Hooman. To avoid overcounting for collisions, there will be a hierarchy for collision checking. No NPC type is affected by colliding with its own type, and every other type follows a hierarchy in order of when they move. This avoids a player hitting a zombie and then vice versa, since each collision damages both, or a goodie bag being picked up twice.
 
 The next part was realizing movement is very similar, and same with bounds checking. I added a virtual move and also a regular out_of_bounds check for Actor, and simplified the code for all movements respectfully. I then changed the death sounds to trigger when hp reduces to 0 or less through taking damage, since dying might not make any sound if they run out of bounds. Then, I added dealing damage between ghostrider and zombies through collisions.
 
-Zombie cabs sound at first like zombies, but they don't grunt. Thus, they are just drunk drivers. Who knew?! Thus, the logic was the same for the movement path length. The logic for initially deciding whether to place a cab was more difficult. I decided to make a function in Student World to check for top and bottom objects in each lane. Since 3! = 6, I used a randInt to decide how to permute the lanes. Likewise, I would order the top/bottom/lane variables for each lane accordingly. This function searched through a vector made of m_game_objects and Ghost_Racer to check for min and max heights. If it was possible, then I would add a zombie cab at the appropriate location. To determine if the cab already damaged the ghost racer, I used the hostile boolean for actor for the first time. If already damaged, the cab driver would become peaceful (since they are probably more dead than they already were).
+Zombie cabs sound at first like zombies, but they don't grunt. Thus, they are just drunk drivers. Who knew?! Thus, the logic was the same for the movement path length. The logic for initially deciding whether to place a cab was more difficult. I decided to make a function in Student World to check for top and bottom objects in each lane. This function would take references to Actor pointers and pass by reference the pointers in the m_game_objects. Since 3! = 6, I used a randInt to decide how to permute the lanes. For example, I could have L/C/R, L/R/C, etc for the ordering. I hard coded each ordering with the respective logic. Likewise, I would order the top/bottom/lane variables for each lane accordingly. This function searched through a vector made of m_game_objects and Ghost_Racer to check for min and max heights. If it was possible, then I would add a zombie cab at the appropriate location. To determine if the cab already damaged the ghost racer, I used the hostile boolean for actor for the first time. If already damaged, the cab driver would become peaceful (since they are probably more dead than they already were).
 
 To check whether there were objects in front or behind, I changed the function to search for collidable objects to have two extra parameters, for the objects to need to be either above a limit or below a limit as well. Thus, I did not need to reuse code, and by default set min and max to the min and max of screen using default parameters. To check whether a cab needs to speed up or slow down, they look for collidable objects and speed up or slow down based on the lane they are in. Thus, zombie taxis were done for now.
 
 After this point, all that remained was to add goodies, add logic that drops goodies from mobs, score, and the display. First, I added oil slicks. I already had a hydroplane method for Ghost_Racer, so it was easy to just check for collisions through player. If there was a collision, the World would play the sound and make player slide a bit. When a zombie car was destroyed by a splash of water, then it would have 1/5th chance of leaving an oil slick.
 
+The Score and Display I added around the same time, along with the member variables and getter/setters. These belonged to StudentWorld, and would call the GameWorld methods to change score and text. I used string streams to do the display since I would call on the score from GameWorld, souls to save member variable from Student World, and so on for each part.
+
+As for the goodies, they all just doSomething. They heal, increase ammo, and increase the souls you've saved and progress through the level. They are self explanatory and are actors, inheriting the move() from actor and doSomething from Actor. Soul goodies do rotate after calling on Actor::doSomething.
+
+StudentWorld is the world of this game. init() initializes the m_souls to save per level, and bonus points. It sets up the inital display and paints the first roads. move() reduces bonus points, tells all actors to doSomething, deletes old objects, then adds new ones according to the formualas in spec, and return some status. If GR dies, then it realizes died. if enough souls saved, when m_soulstosave  = 0, then it finsihed level and restarts, using init, after it increases score by the m_bonus parameter. otherwise, it just keeps the level going. cleanUp just deletes every Actor. check_for_collision takes a pointer to an Actor and checks if any object in m_game_object collides using the collided_with function of actor. This uses the formula as stated in spec. To avoid overcounting, only player and sprays get to check for collisions with other objects. This is checked with a switch case on the Actor's enum for class type, which is returned by Actor's get_class method. The action per class per collision depends on the class type. These are of course decided when they are initialized into the game by move() or by init(). add_new_objects just follows the logic per the spec. find_collidable_objects is the messiest part, where I check every lane by comparing x positions. If less than left edge, then off road. If less than left white border, then in left lane, and so on. This makes sure every object's lane is counted for. Then I hard coded each permutation. Later, I added a min and max with default parameters to reuse code for the zombie cab's slowing and speeding up. This would find for example, the min object that was above the zombie cab, so it reuses code by simply adding an if statement for the min position. Then, there was just save_soul which decreased the number of souls needed to be saved to finish level.
+
+Some "bugs" include sounds overriding other sounds. So, if a sound plays but another plays right after, then both cannot play at the same time. I picked the sound that was more important, like an actor dying over another getting a bit wet. Another bug is that the f key may override the other keys from making input until r is hit, which prevents steering and such during each tick, but that may be due to some OS rather than code itself, as the keypress events for GR's doSomething were following the pseudocode. A feature I found annoying is that pedestrians did not have sophisticated AI to avoid getting in my way. Another annoying not a bug but feature was that the zombie cabs were spawning faster than GR starts depending on spawn location, so if GR was obeying the speed limit, the cabs might not be. This made it occasionally difficult to run them off the road. Likewise, they did not give points for running them off the road, which is disappointing.
+
+Some interpretations taken include having check for collisions only really compare GR and sprays to other objects. This prevents overcounting efficiently. This also uses the order of objects implemented to prevent double counting. Similarly, for this I interpreted healing goodies dropping whenever zombies were killed by sprays and not the GR. There were also some extra keyboard inputs I added for debugging, such as pressing keys to heal and reload ammo or test oil slicks, which may be commented out. I also used a system of strength, resistance, damage_taken and heal_hp for respective actors to deal daamge and recover health. This system was somewhat inspired by Pokemon. Today, we found out SINNOH REMAKES CONFIRMED! I originally planned to just move every actor down by GR's speed but decided not to. It would potentially mess with logic in between the drifting and the doSomethings. Thus, I removed that. Another idea I had was to add a secret combination of key inputs to turn on the debugging keys to unlock cheat mode but I decided not to. I also took the liberty to name the classes however I wanted to, such as calling htem heal and oil_slick. Notably, I named the ghost racer MELODY rather than whatever her name was. Aisha Washington? More like MELODY. This may have to do with the UC system getting my name wrong on some official documents. Most importantly, I decided to not use xCode but rather the skeleton for the one to compile on the command line. I switched over between part 1 and part 2 of the project, so I had to make a new private repository for the new version since the old repo had xCode files. This allowed liberal use of Makefiles for easy git access. Attached below is the Makefile I used with the additions I made to the Makefile provided with the command line skeleton:
+
+CC = c++
+INCLUDES = -I/usr/X11/include/GL
+LIBS = -L/usr/X11/lib -lglut -lGL -lGLU
+STD = -std=c++17
+CCFLAGS = -Wno-deprecated-declarations -Wall
+
+OBJECTS = $(patsubst %.cpp, %.o, $(wildcard *.cpp))
+HEADERS = $(wildcard *.h)
+
+.PHONY: default all clean
+
+PRODUCT = GhostRacer
 
 
+# Compilation commands
+
+all: $(PRODUCT)
+	./GhostRacer
+
+%.o: %.cpp $(HEADERS)
+	$(CC) -c $(STD) $(CCFLAGS) $(INCLUDES) $< -o $@
+
+$(PRODUCT): $(OBJECTS) 
+	$(CC) $(OBJECTS) $(LIBS) -o $@
+
+clean:
+	rm -f *.o *~ *# $(PRODUCT)
+
+run:
+	./GhostRacer
+
+
+# Git commands via Makefile
+
+git: add commit push
+
+add: clean
+	git add -A
+
+commit:
+	git commit -m "$(m)"
+
+push:
+	git push -u origin master
+
+pull:
+	git pull
