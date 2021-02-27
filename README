@@ -1,11 +1,9 @@
 This is how to build GhostRacer in a macOS Terminal window, assuming you've
 already installed XQuartz and freeGLUT:
 
-1. Download the Mac command line skeleton for GhostRacer and unzip it.
-2. To build the program, change into the GhostRacer directory and type
-	make
-3. To run the program, type
-	./GhostRacer
-
-TODO:
-Add all the other classes.
+1. Download project with:
+        git clone https://github.com/NingWang1729/GhostRacer.git
+2. To build the program, change into the GhostRacer directory and type:
+        make
+3. To run the program, type:
+        ./GhostRacer
