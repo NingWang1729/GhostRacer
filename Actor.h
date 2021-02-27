@@ -250,6 +250,9 @@ public:
 
     // Get Depressed
     virtual void get_depressed();
+
+    // Changes speed
+    bool change_speed();
 private:
 };
 

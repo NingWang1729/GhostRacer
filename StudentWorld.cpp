@@ -48,9 +48,11 @@ int StudentWorld::move()
         if (!((*it)->is_alive())) {
             continue;
         }
-        (*it)->doSomething();
-        // All actors shift down based on MELODY's speed
+	// All actors shift down based on MELODY's speed
         (*it)->moveTo((*it)->getX(), (*it)->getY() - drift);
+	// All actors do something
+        (*it)->doSomething();
+        
     }
     // Wonder if she'll bake me some cookies?
     MELODY->doSomething();
@@ -199,13 +201,13 @@ void StudentWorld::add_new_objects() {
 
     // Add hoomans
     if (randInt(0, std::max(200 - GameWorld::getLevel() * 10, 30) - 1) == 0) {
-        m_game_objects.push_back(new hooman(this, randInt(0, VIEW_WIDTH), VIEW_HEIGHT));
+        m_game_objects.push_back(new hooman(this, randInt(0, VIEW_WIDTH - 1), VIEW_HEIGHT));
     }
 
 
     // Add zombies
     if (randInt(0, std::max(200 - GameWorld::getLevel() * 10, 20) - 1) == 0) {
-        m_game_objects.push_back(new zombie(this, randInt(0, VIEW_WIDTH), VIEW_HEIGHT));
+        m_game_objects.push_back(new zombie(this, randInt(0, VIEW_WIDTH - 1), VIEW_HEIGHT));
     }
 
     // Add zombie cabs
@@ -340,8 +342,8 @@ ghost_racer* StudentWorld::find_MELODY() {
     return MELODY;
 };
 
-// Find top objects for each lane
-void StudentWorld::find_collidable_objects(Actor* &top_left, Actor* &top_center, Actor* &top_right, Actor* &bottom_left, Actor* &bottom_center, Actor* &bottom_right) {
+// Find colliable objects for each lane
+void StudentWorld::find_collidable_objects(Actor* &top_left, Actor* &top_center, Actor* &top_right, Actor* &bottom_left, Actor* &bottom_center, Actor* &bottom_right, int min_y, int max_y) {
     Actor* tl = nullptr;
     Actor* tc = nullptr;
     Actor* tr = nullptr;
@@ -370,10 +372,16 @@ void StudentWorld::find_collidable_objects(Actor* &top_left, Actor* &top_center,
 	if ((*it)->GraphObject::getX() < LEFT_EDGE + ROAD_WIDTH/3) {
 	    // On left lane
 	    if ((*it)->GraphObject::getY() > max_left) {
+		if ((*it)->GraphObject::getY() > max_y) {
+		    continue;
+		}
 		max_left = (*it)->GraphObject::getY();
 		tl = *it;
 	    }
 	    if ((*it)->GraphObject::getY() < min_left) {
+		if ((*it)->GraphObject::getY() < min_y) {
+		    continue;
+		}
 		min_left = (*it)->GraphObject::getY();
 		bl = *it;
 	    }
@@ -382,10 +390,16 @@ void StudentWorld::find_collidable_objects(Actor* &top_left, Actor* &top_center,
 	if ((*it)->GraphObject::getX() < RIGHT_EDGE - ROAD_WIDTH/3) {
 	    // On center lane
 	    if ((*it)->GraphObject::getY() > max_center) {
+		if ((*it)->GraphObject::getY() > max_y) {
+		    continue;
+		}
 		max_center = (*it)->GraphObject::getY();
 		tc = *it;
 	    }
 	    if ((*it)->GraphObject::getY() < min_center) {
+		if ((*it)->GraphObject::getY() < min_y) {
+		    continue;
+		}
 		min_center = (*it)->GraphObject::getY();
 		bc = *it;
 	    }
@@ -394,10 +408,16 @@ void StudentWorld::find_collidable_objects(Actor* &top_left, Actor* &top_center,
 	if ((*it)->GraphObject::getX() < RIGHT_EDGE) {
 	    // On Right lane
 	    if ((*it)->GraphObject::getY() > max_right) {
+		if ((*it)->GraphObject::getY() > max_y) {
+		    continue;
+		}
 		max_right = (*it)->GraphObject::getY();
 		tr = *it;
 	    }
 	    if ((*it)->GraphObject::getY() < min_right) {
+		if ((*it)->GraphObject::getY() < min_y) {
+		    continue;
+		}
 		min_right = (*it)->GraphObject::getY();
 		br = *it;
 	    }
