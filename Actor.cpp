@@ -64,7 +64,7 @@ bool Actor::out_of_bounds() {
 
 // Move
 void Actor::move() {
-    GraphObject::moveTo(GraphObject::getX() + Actor::get_x_speed(), GraphObject::getY() + Actor::get_y_speed());
+    GraphObject::moveTo(GraphObject::getX() + Actor::get_x_speed(), GraphObject::getY() + Actor::get_y_speed() - Actor::getWorld()->find_MELODY()->Actor::get_y_speed());
     // Check out of bounds and mileage
     if (Actor::out_of_bounds()) {
         Actor::die();
@@ -582,33 +582,27 @@ bool zombie_cab::change_speed() {
     if (GraphObject::getX() < LEFT_EDGE + ROAD_WIDTH/3) {
 	if (Actor::get_y_speed() <= Actor::getWorld()->find_MELODY()->Actor::get_y_speed() && tl != this && tl != nullptr && tl->GraphObject::getY() > GraphObject::getY() - 96 && tl != Actor::getWorld()->find_MELODY()) {
 	    Actor::set_y_speed(Actor::get_y_speed() + 0.5);
-	    std::cout << "Speed up on left lane" << Actor::get_y_speed() <<  "\n";
 	    return true;
 	} else if (Actor::get_y_speed() > Actor::getWorld()->find_MELODY()->Actor::get_y_speed() && bl != this && bl != nullptr &&  bl->GraphObject::getY() < GraphObject::getY() + 96) {
 	    Actor::set_y_speed(Actor::get_y_speed() - 0.5);
-	    std::cout << "Slow down on left lane" << Actor::get_y_speed() <<  "\n";
 	    return true;
 	}
     } else if (GraphObject::getX() < RIGHT_EDGE - ROAD_WIDTH/3) {
 	if (Actor::get_y_speed() <= Actor::getWorld()->find_MELODY()->Actor::get_y_speed() && tc != this && tc != nullptr && tc->GraphObject::getY() > GraphObject::getY() - 96 && tc != Actor::getWorld()->find_MELODY()) {
 	    Actor::set_y_speed(Actor::get_y_speed() + 0.5);
-	    std::cout << "Speed up on center lane" << Actor::get_y_speed() <<  "\n";
 	    return true;
 	}
 	if (Actor::get_y_speed() > Actor::getWorld()->find_MELODY()->Actor::get_y_speed() && bc != this && bc != nullptr && bc->GraphObject::getY() < GraphObject::getY() + 96) {
 	    Actor::set_y_speed(Actor::get_y_speed() - 0.5);
-	    std::cout << "Slow down on center lane" << Actor::get_y_speed() <<  "\n";
 	    return true;
 	}
     } else if (GraphObject::getX() < RIGHT_EDGE) {
 	if (Actor::get_y_speed() <= Actor::getWorld()->find_MELODY()->Actor::get_y_speed() && tr != this && tr != nullptr && tr->GraphObject::getY() > GraphObject::getY() - 96 && tr != Actor::getWorld()->find_MELODY()) {
 	    Actor::set_y_speed(Actor::get_y_speed() + 0.5);
-	    std::cout << "Speed up on right lane" << Actor::get_y_speed() <<  "\n";
 	    return true;
 	}
 	if (Actor::get_y_speed() > Actor::getWorld()->find_MELODY()->Actor::get_y_speed() && br != this && br != nullptr && br->GraphObject::getY() < GraphObject::getY() + 96) {
 	    Actor::set_y_speed(Actor::get_y_speed() - 0.5);
-	    std::cout << "Slow down on right lane" << Actor::get_y_speed() <<  "\n";
 	    return true;
 	}
     }

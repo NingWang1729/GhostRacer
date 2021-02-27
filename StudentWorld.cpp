@@ -48,8 +48,7 @@ int StudentWorld::move()
         if (!((*it)->is_alive())) {
             continue;
         }
-	// All actors shift down based on MELODY's speed
-        (*it)->moveTo((*it)->getX(), (*it)->getY() - drift);
+	
 	// All actors do something
         (*it)->doSomething();
         
