@@ -31,3 +31,7 @@ Zombie cabs sound at first like zombies, but they don't grunt. Thus, they are ju
 
 To check whether there were objects in front or behind, I changed the function to search for collidable objects to have two extra parameters, for the objects to need to be either above a limit or below a limit as well. Thus, I did not need to reuse code, and by default set min and max to the min and max of screen using default parameters. To check whether a cab needs to speed up or slow down, they look for collidable objects and speed up or slow down based on the lane they are in. Thus, zombie taxis were done for now.
 
+After this point, all that remained was to add goodies, add logic that drops goodies from mobs, score, and the display. First, I added oil slicks. I already had a hydroplane method for Ghost_Racer, so it was easy to just check for collisions through player. If there was a collision, the World would play the sound and make player slide a bit. When a zombie car was destroyed by a splash of water, then it would have 1/5th chance of leaving an oil slick.
+
+
+

@@ -23,10 +23,13 @@ public:
     void add_object(Actor*);
     ghost_racer* find_MELODY();
     void find_collidable_objects(Actor* &top_left, Actor* &top_center, Actor* &top_right, Actor* &bottom_left, Actor* &bottom_center, Actor* &bottom_right, int min_y = 0, int max_y = 255);
+    void save_soul();
 
 private:
     std::vector<Actor*> m_game_objects;
     ghost_racer* MELODY;
+    unsigned long m_souls_to_save;
+    unsigned long m_bonus;
 };
 
 #endif // STUDENTWORLD_H_

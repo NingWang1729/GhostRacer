@@ -148,6 +148,10 @@ bool Actor::collided_with(Actor* other) {
               (GraphObject::getRadius() + other->GraphObject::getRadius()) * 0.6;
 };
 
+// Check hp
+int Actor::check_hp() {
+    return m_hp;
+}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // GHOST RACER CLASS DEFINITIONS
@@ -181,6 +185,7 @@ void ghost_racer::doSomething() {
     } else {
         int ch;
         if (getWorld()->getKey(ch)) {
+	    std::cout << ch << std::endl;
             switch (ch) {
                 case KEY_PRESS_SPACE: {
                     ghost_racer::fire();
@@ -226,8 +231,12 @@ void ghost_racer::doSomething() {
                     ghost_racer::hydroplane();
                     break;
                 }
-                case 104: {
+	        case 104: { // H key to fill with holy water
                     ghost_racer::reload(999);
+                    break;
+                }
+		case 108: { // H key to fill with holy water
+		    Actor::getWorld()->StudentWorld::save_soul();
                     break;
                 }
                 case KEY_PRESS_TAB:{

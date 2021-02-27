@@ -1,6 +1,8 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <sstream>
+#include <iomanip>
 
 #include "StudentWorld.h"
 #include "Actor.h"
@@ -27,7 +29,14 @@ StudentWorld::~StudentWorld() {
 
 int StudentWorld::init()
 {
+    m_souls_to_save = 2 * GameWorld::getLevel() + 5;
+    m_bonus = 5000;
     MELODY = new ghost_racer(this);
+    
+    std::ostringstream score;
+    score << "Score: " << GameWorld::getScore() << "Lvl: " << GameWorld::getLevel() << " Souls2Save: " << m_souls_to_save << " Health: " << StudentWorld::find_MELODY()->Actor::check_hp() << " Sprays: " << StudentWorld::find_MELODY()->ghost_racer::ammo_count() << " Bonus: " << m_bonus;
+    setGameStatText(score.str());
+    
     for (int i = 0; i <  VIEW_HEIGHT / SPRITE_HEIGHT; i++) {
         m_game_objects.push_back(new road(this, LEFT_EDGE, i * SPRITE_HEIGHT, YELLOW_BORDER_LINE, IID_YELLOW_BORDER_LINE, YELLOW));
         m_game_objects.push_back(new road(this, RIGHT_EDGE, i * SPRITE_HEIGHT, YELLOW_BORDER_LINE, IID_YELLOW_BORDER_LINE, YELLOW));
@@ -41,6 +50,10 @@ int StudentWorld::init()
 
 int StudentWorld::move()
 {
+    m_bonus = m_bonus > 0 ? m_bonus - 1 : 0;
+    std::ostringstream score;
+    score << "Score: " << GameWorld::getScore() << "Lvl: " << GameWorld::getLevel() << " Souls2Save: " << m_souls_to_save << " Health: " << StudentWorld::find_MELODY()->Actor::check_hp() << " Sprays: " << StudentWorld::find_MELODY()->ghost_racer::ammo_count() << " Bonus: " << m_bonus;
+    setGameStatText(score.str());
     // Tell actors to doSomething
     for (std::vector<Actor*>::iterator it = m_game_objects.begin(); it != m_game_objects.end(); it++) {
         // Dead men tell no tales
@@ -74,6 +87,12 @@ int StudentWorld::move()
     if (!(MELODY->is_alive())) {
         decLives();
         return GWSTATUS_PLAYER_DIED;
+    }
+
+    // Good enough for government's work
+    if (m_souls_to_save == 0) {
+	GameWorld::increaseScore(m_bonus);
+	return GWSTATUS_FINISHED_LEVEL;
     }
 
     // Otherwise, continue game
@@ -110,6 +129,7 @@ void StudentWorld::check_for_collisions(Actor* game_object) {
 		    case ZOMBIE: {
 		        (*it)->Actor::take_damage(game_object->Actor::get_strength());
         	        game_object->Actor::take_damage((*it)->Actor::get_strength());
+			GameWorld::increaseScore(150);
 		        break;
 		    }
 		    case ZOMBIE_CAB: {
@@ -155,6 +175,8 @@ void StudentWorld::check_for_collisions(Actor* game_object) {
 		        (*it)->Actor::take_damage(game_object->Actor::get_strength());
 			if ((*it)->Actor::is_alive()) {
                             StudentWorld::playSound(SOUND_PED_HURT);
+			} else {
+			    GameWorld::increaseScore(150);
 			}
 			game_object->die();
 		        return;
@@ -167,6 +189,7 @@ void StudentWorld::check_for_collisions(Actor* game_object) {
 			    if (randInt(0, 4) == 0) {
 				m_game_objects.push_back(new oil_slick(this, (*it)->GraphObject::getX(), (*it)->GraphObject::getY(), randInt(2, 5)));
 			    }
+			    GameWorld::increaseScore(200);
 			}
 			game_object->die();
 		        return;
@@ -441,4 +464,9 @@ void StudentWorld::find_collidable_objects(Actor* &top_left, Actor* &top_center,
     bottom_left = bl;
     bottom_center = bc;
     bottom_right = br;
+}
+
+// Save soul
+void StudentWorld::save_soul() {
+    m_souls_to_save = m_souls_to_save > 0 ? m_souls_to_save - 1 : 0;
 }

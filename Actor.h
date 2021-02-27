@@ -74,6 +74,9 @@ public:
     // Checks for collision
     bool collided_with(Actor* other);
 
+    // Check hp
+    int check_hp();
+
 private:
     StudentWorld* m_world;
     npc m_class;
