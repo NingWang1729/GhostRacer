@@ -23,6 +23,12 @@ all: $(PRODUCT)
 $(PRODUCT): $(OBJECTS) 
 	$(CC) $(OBJECTS) $(LIBS) -o $@
 
+submit:
+	zip p3.zip Actor.cpp Actor.h StudentWorld.cpp StudentWorld.h report.txt
+
+view:
+	zipinfo *.zip
+
 clean:
 	rm -f *.o *~ *# $(PRODUCT)
 
