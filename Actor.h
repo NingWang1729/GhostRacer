@@ -3,7 +3,7 @@
 
 #include "GraphObject.h"
 
-enum npc {PLAYER, WHITE_BORDER_LINE, YELLOW_BORDER_LINE, HOLY_WATER_SPRAY, HOOMAN, ZOMBIE, ZOMBIE_CAB};
+enum npc {PLAYER, WHITE_BORDER_LINE, YELLOW_BORDER_LINE, HOLY_WATER_SPRAY, HOOMAN, ZOMBIE, ZOMBIE_CAB, OIL_SLICK};
 enum color {WHITE, YELLOW};
 
 // Students:  Add code to this file, Actor.cpp, StudentWorld.h, and StudentWorld.cpp
@@ -136,9 +136,6 @@ public:
     // Does whatever a road does
     virtual void doSomething();
 
-    // Move
-    virtual void move();
-
     // Return road color
     color road_color();
 
@@ -184,9 +181,6 @@ public:
 
     // Does whatever a hooman does
     virtual void doSomething();
-    
-    // Move
-    virtual void move();
 
     // Return distance traveled
     unsigned long get_planned_movement_distance();
@@ -214,9 +208,6 @@ public:
 
     // Does whatever a zombie does
     virtual void doSomething();
-    
-    // Move
-    virtual void move();
 
     // urrrghhh
     unsigned long get_ticks_until_grunt();
@@ -244,9 +235,6 @@ public:
 
     // Does whatever a zombie does
     virtual void doSomething();
-    
-    // Move
-    virtual void move();
 
     // Get Depressed
     virtual void get_depressed();
@@ -254,6 +242,22 @@ public:
     // Changes speed
     bool change_speed();
 private:
+};
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// OIL_SLICK CLASS DECLARATIONS
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class oil_slick : public Actor {
+public:
+    // Constructor
+    oil_slick(StudentWorld* world, double startX, double startY, double size, npc npc_class = OIL_SLICK, int imageID =  IID_OIL_SLICK, int hp = 0, bool alive = true, int strength = 0, unsigned long resistance = 1000, bool collision_avoidance_worthy = false, bool hostile = false, int x_speed = 0, int y_speed = -4, int startDirection = 0, int depth = 2);
+
+    // Destructor
+    virtual ~oil_slick();
+
+    // Does whatever a spray does
+    virtual void doSomething();
 };
 
 #endif // ACTOR_H_

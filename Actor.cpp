@@ -304,17 +304,7 @@ road::~road() {};
 // Does whatever a ghost racer does
 void road::doSomething() {
     // Road work ahead? Yeah, I sure hope it does!
-    road::move();
-};
-
-// Move
-void road::move() {
     Actor::move();
-    // moveTo(GraphObject::getX() + Actor::get_x_speed(), GraphObject::getY() + Actor::get_y_speed());
-    // if (GraphObject::getX() < 0 || GraphObject::getX() > VIEW_WIDTH ||
-    //     GraphObject::getY() < 0 || GraphObject::getY() > VIEW_HEIGHT) {
-    //     Actor::die();
-    // }
 };
 
 // Return road color
@@ -396,7 +386,7 @@ void hooman::doSomething() {
     }
     
     // Jaywalk
-    hooman::move();
+    Actor::move();
     
     // Fall off bridge
     if (!(Actor::is_alive())) {
@@ -405,11 +395,6 @@ void hooman::doSomething() {
     
     // Lose motivation
     hooman::get_depressed();
-};
-
-//Move
-void hooman::move() {
-    Actor::move();
 };
 
 // Return distance traveled
@@ -488,11 +473,6 @@ void zombie::doSomething() {
     hooman::get_depressed();
 };
 
-// Move
-void zombie::move() {
-    Actor::move();
-};
-
 // urrrghhh
 unsigned long zombie::get_ticks_until_grunt() {
     return m_ticks_until_grunt;
@@ -516,9 +496,7 @@ void zombie::grunt() {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Constructor
 zombie_cab::zombie_cab(StudentWorld* world, double startX, double startY, int x_speed, int y_speed, unsigned long planned_movement_distance, npc npc_class, int imageID, int hp, bool alive, int strength, unsigned long resistance, bool collision_avoidance_worthy, bool hostile, int startDirection, double size, int depth)
-: hooman(world, startX, startY, planned_movement_distance, npc_class, imageID, hp, alive, strength, resistance, collision_avoidance_worthy, hostile, x_speed, y_speed, startDirection, size, depth) {
-    std::cout << "x_speed: " << x_speed << "\ny_speed: " << y_speed << "\n direction: " << startDirection << "\n";
-};
+: hooman(world, startX, startY, planned_movement_distance, npc_class, imageID, hp, alive, strength, resistance, collision_avoidance_worthy, hostile, x_speed, y_speed, startDirection, size, depth) {};
 
 // Destructor
 zombie_cab::~zombie_cab() {};
@@ -530,7 +508,7 @@ void zombie_cab::doSomething() {
     }
     
     // Check for collisions
-    Actor::getWorld()->check_for_collisions(this);
+    Actor::getWorld()->StudentWorld::check_for_collisions(this);
     
     // Kerplat!
     if (!(Actor::is_alive())) {
@@ -538,7 +516,7 @@ void zombie_cab::doSomething() {
     }
 
     // Jaywalk
-    zombie_cab::move();
+    Actor::move();
     
     // Fall off bridge
     if (!(Actor::is_alive())) {
@@ -546,17 +524,11 @@ void zombie_cab::doSomething() {
     }
 
     if (zombie_cab::change_speed()) {
-	std::cout << "CHANGING SPEED\n";
 	return;
     }
     
     // Lose motivation
     zombie_cab::get_depressed();
-};
-
-// Vroom vroom
-void zombie_cab::move() {
-    Actor::move();
 };
 
 // Lose motivation
@@ -608,3 +580,32 @@ bool zombie_cab::change_speed() {
     }
     return false;
 };
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// OIL SLICK CLASS DEFINITIONS
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+oil_slick::oil_slick(StudentWorld* world, double startX, double startY, double size, npc npc_class, int imageID, int hp, bool alive, int strength, unsigned long resistance, bool collision_avoidance_worthy, bool hostile, int x_speed, int y_speed, int startDirection, int depth)
+: Actor(world, npc_class, hp, alive, strength, resistance, collision_avoidance_worthy, hostile, x_speed, y_speed, imageID, startX, startY, startDirection, size, depth) {};
+
+// Destructor
+oil_slick::~oil_slick() {};
+
+// Does whatever an oil slick does
+void oil_slick::doSomething() {
+    // Check for evaporation
+    if (!(Actor::is_alive())) {
+        return;
+    }
+    
+    Actor::move();
+
+    // Check for evaporation
+    if (!(Actor::is_alive())) {
+        return;
+    }
+
+    // Check for slips
+    Actor::getWorld()->StudentWorld::check_for_collisions(this);
+};
+

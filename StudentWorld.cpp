@@ -42,7 +42,6 @@ int StudentWorld::init()
 int StudentWorld::move()
 {
     // Tell actors to doSomething
-    auto drift = MELODY->get_y_speed();
     for (std::vector<Actor*>::iterator it = m_game_objects.begin(); it != m_game_objects.end(); it++) {
         // Dead men tell no tales
         if (!((*it)->is_alive())) {
@@ -129,6 +128,10 @@ void StudentWorld::check_for_collisions(Actor* game_object) {
 			game_object->Actor::take_damage((*it)->Actor::get_strength());
 	                break;
 	            }
+		    case OIL_SLICK: {
+        	        StudentWorld::find_MELODY()->ghost_racer::hydroplane();
+		        break;
+		    }
                     default:
                         break;
                 }
@@ -160,6 +163,10 @@ void StudentWorld::check_for_collisions(Actor* game_object) {
 		        (*it)->Actor::take_damage(game_object->Actor::get_strength());
 			if ((*it)->Actor::is_alive()) {
                             StudentWorld::playSound(SOUND_VEHICLE_HURT);
+			} else {
+			    if (randInt(0, 4) == 0) {
+				m_game_objects.push_back(new oil_slick(this, (*it)->GraphObject::getX(), (*it)->GraphObject::getY(), randInt(2, 5)));
+			    }
 			}
 			game_object->die();
 		        return;
@@ -330,6 +337,9 @@ void StudentWorld::add_new_objects() {
 	if (open_lane) {
 	    m_game_objects.push_back(new zombie_cab(this, x, y, x_speed, y_speed));
 	}
+    }
+    if (randInt(0, std::max(150 - GameWorld::getLevel() * 10, 40) - 1) == 0) {
+	m_game_objects.push_back(new oil_slick(this, randInt(LEFT_EDGE, RIGHT_EDGE), VIEW_HEIGHT, randInt(2, 5)));
     }
 };
 
