@@ -34,7 +34,7 @@ int StudentWorld::init()
     MELODY = new ghost_racer(this);
     
     std::ostringstream score;
-    score << "Score: " << GameWorld::getScore() << "Lvl: " << GameWorld::getLevel() << " Souls2Save: " << m_souls_to_save << " Health: " << StudentWorld::find_MELODY()->Actor::check_hp() << " Sprays: " << StudentWorld::find_MELODY()->ghost_racer::ammo_count() << " Bonus: " << m_bonus;
+    score << "Score: " << GameWorld::getScore() << "  Lvl: " << GameWorld::getLevel() << "  Souls2Save: " << m_souls_to_save << "  Lives: " << GameWorld::getLives() << "  Health: " << StudentWorld::find_MELODY()->Actor::check_hp() << "  Sprays: " << StudentWorld::find_MELODY()->ghost_racer::ammo_count() << "  Bonus: " << m_bonus;
     setGameStatText(score.str());
     
     for (int i = 0; i <  VIEW_HEIGHT / SPRITE_HEIGHT; i++) {
@@ -52,7 +52,7 @@ int StudentWorld::move()
 {
     m_bonus = m_bonus > 0 ? m_bonus - 1 : 0;
     std::ostringstream score;
-    score << "Score: " << GameWorld::getScore() << "Lvl: " << GameWorld::getLevel() << " Souls2Save: " << m_souls_to_save << " Health: " << StudentWorld::find_MELODY()->Actor::check_hp() << " Sprays: " << StudentWorld::find_MELODY()->ghost_racer::ammo_count() << " Bonus: " << m_bonus;
+    score << "Score: " << GameWorld::getScore() << "  Lvl: " << GameWorld::getLevel() << "  Souls2Save: " << m_souls_to_save << "  Lives: " << GameWorld::getLives() << "  Health: " << StudentWorld::find_MELODY()->Actor::check_hp() << "  Sprays: " << StudentWorld::find_MELODY()->ghost_racer::ammo_count() << "  Bonus: " << m_bonus;
     setGameStatText(score.str());
     // Tell actors to doSomething
     for (std::vector<Actor*>::iterator it = m_game_objects.begin(); it != m_game_objects.end(); it++) {

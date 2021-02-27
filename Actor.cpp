@@ -248,25 +248,23 @@ void ghost_racer::doSomething() {
                     }
                     break;
                 }
-	        case 121: { // Y key to fill with holy water
-                    ghost_racer::reload(999);
-                    break;
-                }
-		case 111:{ // O key to test oil slick
-                    ghost_racer::hydroplane();
-                    break;
-                }
-		case 108: { // L key to make level progress
-		    Actor::getWorld()->StudentWorld::save_soul();
-                    break;
-                }
-		case 104: { // H key to heal
-                    Actor::heal_hp(10);
-                    break;
-                }
-                case KEY_PRESS_TAB:{
-                    break;
-                }
+	        // case 121: { // Y key to fill with holy water
+                //     ghost_racer::reload(999);
+                //     break;
+                // }
+		// case 111:{ // O key to test oil slick
+                //     ghost_racer::hydroplane();
+                //     break;
+                // }
+		// case 108: { // L key to make level progress
+		//     Actor::getWorld()->StudentWorld::save_soul();
+                //     break;
+                // }
+		// case 104: { // H key to heal
+                //     Actor::heal_hp(10);
+                //     break;
+                // }
+                case KEY_PRESS_TAB:
                 case KEY_PRESS_ENTER:
                 case KEY_PRESS_ESCAPE:
                 default:
@@ -520,7 +518,6 @@ void zombie::set_ticks_until_grunt(unsigned long ticks_until_grunt) {
 
 // Grunt
 void zombie::grunt() {
-    std::cout << "GRUNTING\n";
     Actor::getWorld()->StudentWorld::playSound(SOUND_ZOMBIE_ATTACK);
     zombie::set_ticks_until_grunt(20);
 };
