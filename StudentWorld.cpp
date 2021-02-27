@@ -74,6 +74,7 @@ int StudentWorld::move()
             it++;
         } else {
             (*it)->~Actor();
+	    delete (*it);
             m_game_objects.erase(it);
         }
     }
@@ -104,8 +105,10 @@ void StudentWorld::cleanUp()
     // Bring out your alives!
     for (std::vector<Actor*>::iterator it = m_game_objects.begin(); it != m_game_objects.end();) {
         (*it)->~Actor();
+	delete (*it);
         m_game_objects.erase(it);
     }
+    delete MELODY;
     MELODY->~ghost_racer();
 };
 
@@ -133,7 +136,7 @@ void StudentWorld::check_for_collisions(Actor* game_object) {
 		        break;
 		    }
 		    case ZOMBIE_CAB: {
-			if (!((*it)->zombie_cab::is_hostile())) {
+			if (!((*it)->Actor::is_hostile())) {
 			    break;
 			}
 			StudentWorld::playSound(SOUND_VEHICLE_CRASH);

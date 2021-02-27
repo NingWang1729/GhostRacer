@@ -213,7 +213,7 @@ public:
     virtual void doSomething();
 
     // urrrghhh
-    unsigned long get_ticks_until_grunt();
+    int get_ticks_until_grunt();
 
     // uhgeuhhg
     void set_ticks_until_grunt(unsigned long ticks_until_grunt);
@@ -222,7 +222,7 @@ public:
     void grunt();
 
 private:
-    unsigned long m_ticks_until_grunt;
+    int m_ticks_until_grunt;
 };
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -257,9 +257,6 @@ public:
 
     // Destructor
     virtual ~oil_slick();
-
-    // Does whatever a spray does
-    virtual void doSomething();
 };
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

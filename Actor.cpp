@@ -508,7 +508,7 @@ void zombie::doSomething() {
 };
 
 // urrrghhh
-unsigned long zombie::get_ticks_until_grunt() {
+int zombie::get_ticks_until_grunt() {
     return m_ticks_until_grunt;
 };
 
@@ -520,6 +520,7 @@ void zombie::set_ticks_until_grunt(unsigned long ticks_until_grunt) {
 
 // Grunt
 void zombie::grunt() {
+    std::cout << "GRUNTING\n";
     Actor::getWorld()->StudentWorld::playSound(SOUND_ZOMBIE_ATTACK);
     zombie::set_ticks_until_grunt(20);
 };
@@ -624,24 +625,6 @@ oil_slick::oil_slick(StudentWorld* world, double startX, double startY, double s
 
 // Destructor
 oil_slick::~oil_slick() {};
-
-// Does whatever an oil slick does
-void oil_slick::doSomething() {
-    // Check for evaporation
-    if (!(Actor::is_alive())) {
-        return;
-    }
-    
-    Actor::move();
-
-    // Check for evaporation
-    if (!(Actor::is_alive())) {
-        return;
-    }
-
-    // Check for slips
-    Actor::getWorld()->StudentWorld::check_for_collisions(this);
-};
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
